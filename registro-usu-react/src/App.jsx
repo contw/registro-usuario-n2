@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Container, Tabs, Tab, Box, Typography } from '@mui/material';
+import UserForm from './components/UserForm';
+import UserList from './components/UserList';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [tabIndex, setTabIndex] = useState(0);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+    setUsers(storedUsers);
+  }, []);
+
+  const handleAddUser = (user) => {
+    const updatedUsers = [...users, user];
+    setUsers(updatedUsers);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom align="center">
+        Cadastro de Usuários
+      </Typography>
 
-export default App
+      <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} centered>
+        <Tab label="Cadastrar" />
+        <Tab label="Usuários Cadastrados" />
+      </Tabs>
+
+      <Box sx={{ mt: 3 }}>
+        {tabIndex === 0 && <UserForm onAddUser={handleAddUser} />}
+        {tabIndex === 1 && <UserList users={users} />}
+      </Box>
+    </Container>
+  );
+}
